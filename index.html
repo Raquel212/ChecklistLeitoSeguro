@@ -161,8 +161,8 @@
                     <fieldset class="border border-gray-300 p-4 rounded-lg">
                         <legend class="text-lg font-medium text-gray-800 px-2">Checklist do Leito</legend>
                         <div class="overflow-x-auto border border-gray-200 rounded-lg mt-2">
-                            <table class="min-w-full divide-y divide-gray-200">
-                                <thead class="bg-gray-50">
+                            <table class="min-w-full">
+                                <thead class="bg-gray-50 hidden md:table-header-group">
                                     <tr>
                                         <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item do Leito</th>
                                         <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Trava</th>
@@ -170,7 +170,8 @@
                                         <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Danos Físicos / Rachaduras</th>
                                     </tr>
                                 </thead>
-                                <tbody class="bg-white divide-y divide-gray-200" id="checklistItemsLeito"></tbody>
+                                <tbody class="bg-white divide-y divide-gray-200" id="checklistItemsLeito">
+                                    </tbody>
                             </table>
                         </div>
                     </fieldset>
@@ -309,13 +310,11 @@
     const modalMessage = document.getElementById('modalMessage');
     const closeModalButton = document.getElementById('closeModalButton');
 
-
     const ITENS_LEITO = [
         { id: 'gradeDirCab', nome: 'Grade Direita (cabeceira)' },
         { id: 'gradeEsqCab', nome: 'Grade Esquerda (cabeceira)' },
         { id: 'gradeDirPes', nome: 'Grade Direita (pés)' },
         { id: 'gradeEsqPes', nome: 'Grade Esquerda (pés)' },
-        { id: 'estruturaGeral', nome: 'Estrutura Geral' }
     ];
 
 
@@ -378,25 +377,50 @@
 
     function criarLinhasLeito() {
         checklistItemsLeitoContainer.innerHTML = '';
+        
+        const selectHTML = (name) => `
+            <select name="${name}" required class="md:w-full bg-white border border-gray-300 rounded-md shadow-sm px-3 py-2 text-sm focus:outline-none">
+                <option value="Sim">Sim</option>
+                <option value="Não">Não</option>
+                <option value="N/A">N/A</option>
+            </select>
+        `;
+        
         ITENS_LEITO.forEach(item => {
             const tr = document.createElement('tr');
-            tr.className = "whitespace-nowrap";
-            const selectHTML = (name) => `
-                <select name="${name}" required class="w-full bg-white border border-gray-300 rounded-md shadow-sm px-3 py-2 text-sm focus:outline-none">
-                    <option value="Sim">Sim</option>
-                    <option value="Não">Não</option>
-                    <option value="N/A">N/A</option>
-                </select>
-            `;
+            
+            tr.className = "block md:table-row";
+            
             tr.innerHTML = `
-                <td class="px-4 py-3 text-sm font-medium text-gray-900">${item.nome}</td>
-                <td class="px-4 py-3">${selectHTML(`${item.id}_trava`)}</td>
-                <td class="px-4 py-3">${selectHTML(`${item.id}_limpo`)}</td>
-                <td class="px-4 py-3">${selectHTML(`${item.id}_danos`)}</td>
+                <td class="block md:table-cell px-4 py-3 text-sm font-medium text-gray-900">
+                    ${item.nome}
+                </td>
+                
+                <td class="block md:table-cell px-4 py-3">
+                    <div class="flex justify-between items-center md:block">
+                        <span class="md:hidden text-sm font-medium text-gray-600">Trava</span>
+                        ${selectHTML(`${item.id}_trava`)}
+                    </div>
+                </td>
+
+                <td class="block md:table-cell px-4 py-3">
+                    <div class="flex justify-between items-center md:block">
+                        <span class="md:hidden text-sm font-medium text-gray-600">Limpo/Org.</span>
+                        ${selectHTML(`${item.id}_limpo`)}
+                    </div>
+                </td>
+
+                <td class="block md:table-cell px-4 py-3">
+                    <div class="flex justify-between items-center md:block">
+                        <span class="md:hidden text-sm font-medium text-gray-600">Danos/Rachad.</span>
+                        ${selectHTML(`${item.id}_danos`)}
+                    </div>
+                </td>
             `;
             checklistItemsLeitoContainer.appendChild(tr);
         });
 
+        // O listener de status permanece o mesmo
         checklistItemsLeitoContainer.querySelectorAll('select').forEach(select => {
             const updateStatus = (selectElement) => {
                 const value = selectElement.value;
